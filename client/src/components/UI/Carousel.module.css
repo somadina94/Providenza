@@ -1,0 +1,38 @@
+.carousel {
+    position: relative;
+    margin: auto;
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 60rem;
+}
+
+.carousel-mobile {
+    display: none;
+}
+
+.carousel-item {
+    transition: all 2s;
+    height: 100%;
+    width: 100%;
+}
+
+.c-img {
+    margin: auto;
+    width: 100%;
+    height: 60rem;
+}
+
+@media (max-width: 50em) {
+    .carousel-desktop {
+        display: none;
+    }
+
+    .carousel-mobile {
+        display: block;
+    }
+}

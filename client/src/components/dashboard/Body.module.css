@@ -1,0 +1,12 @@
+.dash {
+    position: relative;
+}
+
+.dash aside {
+    position: fixed;
+    z-index: 2;
+}
+
+.dash main {
+    padding-left: 6rem;
+}
