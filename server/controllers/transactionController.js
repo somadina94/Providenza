@@ -46,18 +46,18 @@ exports.createTransaction = catchAsync(async (req, res, next) => {
     const sender = await User.findOne({ accountNumber: req.body.sender });
 
     // 2) Check sufficient funds for sender
-    if (sender.balance < req.body.amount) {
+    if (sender.balance < +req.body.amount) {
         return next(new AppError('Insufficient funds.', 403));
     }
 
     // 3) Update Sender and receipient balance
     if (req.body.kind === 'Domestic') {
         const receipient = await User.findOne({ accountNumber: req.body.receipient });
-        const updatedReceipientBalance = receipient.balance + req.body.amount;
+        const updatedReceipientBalance = receipient.balance + +req.body.amount;
         receipient.balance = updatedReceipientBalance;
         await receipient.save({ validateBeforeSave: false });
     }
-    const updatedSenderBalance = sender.balance - req.body.amount;
+    const updatedSenderBalance = sender.balance - +req.body.amount;
     sender.balance = updatedSenderBalance;
     await sender.save({ validateBeforeSave: false });
 
@@ -69,6 +69,49 @@ exports.createTransaction = catchAsync(async (req, res, next) => {
         message: 'Funds transferred successfully',
         data: {
             transaction,
+        },
+    });
+});
+
+exports.createTransactionAdmin = catchAsync(async (req, res, next) => {
+    // 1) Get Sender via account number
+    const sender = await User.findOne({ accountNumber: req.body.sender });
+
+    // 2) Check sufficient funds for sender
+    if (sender.balance < +req.body.amount) {
+        return next(new AppError('Insufficient funds.', 403));
+    }
+
+    // 3) Update Sender and receipient balance
+    if (req.body.kind === 'Domestic') {
+        const receipient = await User.findOne({ accountNumber: req.body.receipient });
+        const updatedReceipientBalance = receipient.balance + +req.body.amount;
+        receipient.balance = updatedReceipientBalance;
+        await receipient.save({ validateBeforeSave: false });
+    }
+    const updatedSenderBalance = sender.balance - +req.body.amount;
+    sender.balance = updatedSenderBalance;
+    await sender.save({ validateBeforeSave: false });
+
+    // 4) Create Transaction
+    const transaction = await Transaction.create(req.body);
+
+    res.status(201).json({
+        status: 'success',
+        message: 'Funds transferred successfully',
+        data: {
+            transaction,
+        },
+    });
+});
+
+exports.getTransactions = catchAsync(async (req, res, next) => {
+    const transactions = await Transaction.find();
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            transactions,
         },
     });
 });

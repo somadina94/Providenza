@@ -1,0 +1,9 @@
+.transactions {
+    max-width: 90%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    row-gap: 4rem;
+}

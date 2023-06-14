@@ -22,10 +22,11 @@ import Password from './components/authentication/Password';
 import UploadPhoto from './components/dashboard/UploadPhoto';
 import ForgotPassword from './components/authentication/ForgotPassword';
 import ResetPassword from './components/authentication/ResetPassword';
+import ErrorModal from './components/UI/ErrorModal';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<Layout />} errorElement={<ErrorModal />}>
             <Route index element={<HomePage />} />
             <Route path="banking" element={<Banking />} />
             <Route path="borrowing" element={<Borrowing />} />

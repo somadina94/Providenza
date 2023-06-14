@@ -94,10 +94,7 @@ const Login = () => {
         <Fragment>
             <Helmet>
                 <title>Login</title>
-                <meta
-                    name="description"
-                    content="Login to your account now and be able to make your social media account purchases in minutes."
-                />
+                <meta name="description" content="" />
                 <link rel="canonical" href="/Login" />
             </Helmet>
             <form className={classes.form} onSubmit={submitHandler}>
