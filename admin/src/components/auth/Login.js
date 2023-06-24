@@ -76,7 +76,7 @@ const Login = () => {
             dispatch(authActions.login({ user: res.data.user }));
             dispatch(alertActions.setState({ message: res.message, status: res.status }));
             setCookie('jwt', res.token);
-            navigate('/', { replace: true });
+            navigate('/accounts', { replace: true });
         } else {
             dispatch(alertActions.setState({ message: res.message, status: 'error' }));
         }

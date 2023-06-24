@@ -77,21 +77,27 @@ exports.createTransactionAdmin = catchAsync(async (req, res, next) => {
     // 1) Get Sender via account number
     const sender = await User.findOne({ accountNumber: req.body.sender });
 
+    // console.log(sender);
+
     // 2) Check sufficient funds for sender
-    if (sender.balance < +req.body.amount) {
+    if (sender && sender.balance < +req.body.amount) {
         return next(new AppError('Insufficient funds.', 403));
     }
 
     // 3) Update Sender and receipient balance
     if (req.body.kind === 'Domestic') {
         const receipient = await User.findOne({ accountNumber: req.body.receipient });
+        console.log(receipient);
         const updatedReceipientBalance = receipient.balance + +req.body.amount;
         receipient.balance = updatedReceipientBalance;
         await receipient.save({ validateBeforeSave: false });
     }
-    const updatedSenderBalance = sender.balance - +req.body.amount;
-    sender.balance = updatedSenderBalance;
-    await sender.save({ validateBeforeSave: false });
+
+    if (sender) {
+        const updatedSenderBalance = sender.balance - +req.body.amount;
+        sender.balance = updatedSenderBalance;
+        await sender.save({ validateBeforeSave: false });
+    }
 
     // 4) Create Transaction
     const transaction = await Transaction.create(req.body);

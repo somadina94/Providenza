@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
             validate: [validator.isEmail, 'Please provide a valid email'],
         },
         accountNumber: {
-            type: Number,
+            type: String,
             default: Math.floor(Math.random() * (5999999999 - 5000000000)) + 5000000000,
         },
         photo: {

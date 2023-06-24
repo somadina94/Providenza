@@ -16,7 +16,7 @@ const transactionSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
-        sender: Number,
+        sender: String,
         receipient: String,
     },
     {

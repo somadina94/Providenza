@@ -59,7 +59,7 @@ const CreateTransaction = () => {
             </div>
             <div className={classes.group}>
                 <label>Sender</label>
-                <input type="number" ref={senderRef} />
+                <input type="text" ref={senderRef} />
             </div>
             <div className={classes.group}>
                 <label>Receipient</label>

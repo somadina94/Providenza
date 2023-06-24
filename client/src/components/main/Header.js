@@ -9,6 +9,7 @@ import { FaAlignJustify } from 'react-icons/fa';
 import classes from './Header.module.css';
 import { getOneUser } from '../../api/api';
 import Nav from './Nav';
+import { image } from '../../config';
 
 const Header = () => {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -47,7 +48,7 @@ const Header = () => {
             {isLoggedIn && isLoading && <Skeleton variant="circle" className={classes.skeleton} />}
             {isLoggedIn && !isLoading && (
                 <div className={classes.userImg}>
-                    <img src={photo} alt="user" />
+                    <img src={image} alt="user" />
                 </div>
             )}
         </header>
