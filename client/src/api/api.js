@@ -121,7 +121,7 @@ export const getOneUser = async (jwt, id) => {
 export const uploadPhoto = async (jwt, data) => {
     try {
         const res = await axiosInstance({
-            method: 'PUT',
+            method: 'POST',
             url: `users/uploadPhoto`,
             data,
             headers: {

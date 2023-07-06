@@ -6,6 +6,7 @@ import { useCookies } from 'react-cookie';
 import classes from './UploadPhoto.module.css';
 import { alertActions } from '../../store/alert-slice';
 import { uploadPhoto } from '../../api/api';
+import { authActions } from '../../store/auth-slice';
 import Spinner from '../UI/Spinner';
 
 const UploadPhoto = () => {
@@ -25,6 +26,7 @@ const UploadPhoto = () => {
 
         if (res.status === 'success') {
             dispatch(alertActions.setState({ message: 'Photo uploaded successfully', status: res.status }));
+            dispatch(authActions.refreshUser({ user: res.data.user }));
         } else {
             dispatch(alertActions.setState({ message: res.message, status: 'error' }));
         }

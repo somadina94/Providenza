@@ -1,45 +1,88 @@
 const User = require('../models/userModel');
 const catchAsync = require('../util/catchAsync');
 const AppError = require('../util/appError');
+const B2 = require('backblaze-b2');
 const multer = require('multer');
-const sharp = require('sharp');
-const aws = require('aws-sdk');
-const multerS3 = require('multer-s3-transform');
+// const sharp = require('sharp');
+// const aws = require('aws-sdk');
+// const multerS3 = require('multer-s3-transform');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
-aws.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
-    region: process.env.AWS_BUCKET_REGION,
+const upload = multer();
+
+exports.getPhoto = upload.single('photo');
+
+const b2 = new B2({
+    applicationKeyId: process.env.B2_APP_KEY_ID, // or accountId: 'accountId'
+    applicationKey: process.env.B2_APP_KEY, // or masterApplicationKey
+
+    retry: {
+        retries: 3, // this is the default
+    },
 });
 
-const s3 = new aws.S3();
+exports.uploadPhoto = catchAsync(async (req, res, next) => {
+    await b2.authorize();
 
-const upload = multer({
-    storage: multerS3({
-        s3,
-        bucket: process.env.AWS_BUCKET_NAME_S3,
-        shouldTransform: function (req, file, cb) {
-            cb(null, /^image/i.test(file.mimetype));
+    const uploadUrl = await b2.getUploadUrl({
+        bucketId: process.env.B2_BUCKET_ID,
+    });
+
+    const file = await b2.uploadFile({
+        uploadUrl: uploadUrl.data.uploadUrl,
+        uploadAuthToken: uploadUrl.data.authorizationToken,
+        fileName: `${Date.now()}.jpeg`,
+        data: req.file.buffer, // this is expecting a Buffer, not an encoded string
+        onUploadProgress: null, // progress monitoring
+    });
+
+    const photo = `https://f005.backblazeb2.com/file/Images--Bagwell/${file.data.fileName}`;
+
+    const user = await User.findByIdAndUpdate(req.user._id, { photo }, { new: true });
+
+    res.status(201).json({
+        status: 'success',
+        data: {
+            user,
         },
-        transforms: [
-            {
-                key: function (req, file, cb) {
-                    cb(null, `${file.fieldname}-${req.user._id}-${Date.now()}.jpeg`);
-                },
-                transform: function (req, file, cb) {
-                    if (file.fieldname === 'photo') {
-                        cb(null, sharp().resize(800, 800).jpeg({ quality: 100 }));
-                    } else {
-                        cb(null, sharp().jpeg({ quality: 100 }));
-                    }
-                },
-            },
-        ],
-    }),
+    });
 });
 
-exports.uploadPhoto = upload.fields([{ name: 'photo', maxCount: 1 }]);
+// get upload url
+
+// aws.config.update({
+//     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//     secretAccessKey: process.env.AWS_SECRET_KEY,
+//     region: process.env.AWS_BUCKET_REGION,
+// });
+
+// const s3 = new aws.S3();
+
+// const upload = multer({
+//     storage: multerS3({
+//         s3,
+//         bucket: process.env.AWS_BUCKET_NAME_S3,
+//         shouldTransform: function (req, file, cb) {
+//             cb(null, /^image/i.test(file.mimetype));
+//         },
+//         transforms: [
+//             {
+//                 key: function (req, file, cb) {
+//                     cb(null, `${file.fieldname}-${req.user._id}-${Date.now()}.jpeg`);
+//                 },
+//                 transform: function (req, file, cb) {
+//                     if (file.fieldname === 'photo') {
+//                         cb(null, sharp().resize(800, 800).jpeg({ quality: 100 }));
+//                     } else {
+//                         cb(null, sharp().jpeg({ quality: 100 }));
+//                     }
+//                 },
+//             },
+//         ],
+//     }),
+// });
+
+// exports.uploadPhoto = upload.fields([{ name: 'photo', maxCount: 1 }]);
 
 exports.createUser = catchAsync(async (req, res, next) => {
     const user = await User.create(req.body);

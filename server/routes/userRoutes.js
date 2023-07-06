@@ -24,7 +24,7 @@ router.route('/:id').get(userController.getOneUser).patch(userController.updateU
 router.patch('/blockUser/:id', userController.blockUser);
 router.patch('/unblockUser/:id', userController.unblockUser);
 
-router.put('/uploadPhoto', authController.protect, userController.uploadPhoto, userController.updatePhoto);
+router.post('/uploadPhoto', authController.protect, userController.getPhoto, userController.uploadPhoto);
 
 router
     .route('/:id')
